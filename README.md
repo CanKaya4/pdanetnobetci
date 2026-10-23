@@ -6,7 +6,7 @@ Kotlin Android uygulaması ve Windows için ücretsiz, yerel çalışan bağlant
 
 ## İndirme ve kurulum
 
-GitHub Releases içindeki `PdaNet-Nobetci.apk` ve `Windows-Nobetci.zip` dosyalarını kullanın. Her push için Actions → Build and verify → Artifacts bölümünde de çıktılar bulunur. APK Android 9+ içindir; Galaxy A56'nın Android sürümünde kurulabilir hedef/min SDK kullanır, fakat cihaz üzerinde kurulum henüz test edilmedi. APK test anahtarıyla imzalanır; farklı CI çalıştırmalarının anahtarları değişebilir, güncelleme sırasında eski uygulamayı kaldırmak gerekebilir.
+[GitHub Releases](https://github.com/CanKaya4/pdanetnobetci/releases) içindeki `PdaNet-Nobetci.apk` ve `Windows-Nobetci.zip` dosyalarını kullanın. Her push için Actions → Build and verify → Artifacts bölümünde de çıktılar bulunur. APK Android 9+ içindir; Galaxy A56'nın Android sürümünde kurulabilir hedef/min SDK kullanır, fakat cihaz üzerinde kurulum henüz test edilmedi. APK test anahtarıyla imzalanır; farklı CI çalıştırmalarının anahtarları değişebilir, güncelleme sırasında eski uygulamayı kaldırmak gerekebilir.
 
 1. Telefona APK'yı kurun, uygulamadaki **İlk kurulum rehberi** üzerinden erişilebilirlik ve bildirim gösterme iznini verin. Bildirim erişimi isteğe bağlıdır. Samsung pil ayarlarından uygulamayı uykuya alınmayanlara ekleyin.
 2. PdaNet'in normal USB bağlantısını telefon ve PC'de bir kez kurun, ardından **Korumayı aç** seçeneğini etkinleştirin. İlk çalıştırmada PdaNet'i görünür yapın. Kilit ekranını uygulama aşamaz.
@@ -53,7 +53,7 @@ Windows'ta Gradle/JUnit yol kodlaması nedeniyle projeyi yalnızca ASCII karakte
 dotnet build windows/Nobetci.csproj -c Release
 ```
 
-Windows EXE .NET Framework 4.8 kullanır. CI Android derleme/lint/JUnit ve Windows derleme/self-test işlemlerini çalıştırır, artifact yükler. `v*` etiketi başarılı iki işten sonra GitHub Release ve SHA256SUMS üretir. CI test imzası üretim için kalıcı imza stratejisi değildir.
+Windows EXE .NET Framework 4.8 kullanır. CI Android derleme/lint/JUnit ve Windows derleme/self-test işlemlerini çalıştırır, artifact yükler. İlk başarılı main derlemesi v0.1.0 sürümünü; sonraki `v*` etiketleri kendi sürümlerini GitHub Release ve SHA256SUMS ile üretir. Mevcut sürüm dosyalarının üzerine yazılmaz. CI test imzası üretim için kalıcı imza stratejisi değildir.
 
 ## Belgeler
 

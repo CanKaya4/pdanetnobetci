@@ -10,16 +10,22 @@
 
 İlk yerel denemede Java 25 uyumsuzluğu, daha sonra Türkçe klasör yolundan kaynaklanan JUnit ClassNotFoundException oluştu. Java 17 ve ASCII klasörde yeniden derleme ile çözüldü. Son teslim APK'sı başarılı son derlemeden kopyalandı.
 
-## GitHub engeli
+## GitHub Actions ve yayın
 
-Depo boş olarak klonlandı. GitHub bağlantısı depo metadatasında push/admin izni gösterdi; fakat `README.md` oluşturma işlemi **HTTP 403 Resource not accessible by integration** hatasıyla reddedildi. Yerel Git Credential Manager'da GitHub hesabı bulunmadı; push kimlik doğrulaması yapamadı. Hiçbir kaynak dosyanın GitHub'a yüklendiği, Actions çalıştırıldığı veya Release yayımlandığı iddia edilmez.
+İlk yazma denemesi HTTP 403 hatasıyla engellendi. Kullanıcı yanıtından sonra tekrar denendi ve GitHub bağlantısı kaynakları başarıyla yükledi.
 
-Yerel kaynak ve wrapper hazırdır. Erişim düzelince kaynak klasöründe:
+[Başarılı Actions çalışması](https://github.com/CanKaya4/pdanetnobetci/actions/runs/39952290948): Android derleme/lint/JUnit, Windows derleme/self-test, APK/Windows/test raporu artifacts ve release işi başarılı.
+
+[v0.1.0 sürümü](https://github.com/CanKaya4/pdanetnobetci/releases/tag/v0.1.0) yayımlandı. GitHub'dan indirilen gerçek APK'nın imzası apksigner ile ayrıca doğrulandı. İlk Windows release ZIP'inde alt klasördeki EXE eksikti; paketleme recursive/flat ZIP ve EXE varlığı kontrolü ile düzeltildi. Eksik paket için düzeltme iş akışı aynı APK'yı koruyarak Windows ZIP'ini ve kontrol toplamlarını yeniler.
+
+SDK kurulumundaki eski `tools` paketinin bulunamaması açık `platform-tools platforms;android-35 build-tools;35.0.0` listesiyle düzeltildi. Başarılı Actions derlemesi cihaz testinin yerine geçmez; donanım matrisi hâlâ doğrulama bekler.
+
+Gelecekte yeni sürüm için (uygulama sürüm kodu/adını güncelledikten sonra):
 
 ```sh
 git push -u origin main
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.1
+git push origin v0.1.1
 ```
 
-İlk komut yazma yetkili Git oturumu gerektirir. Etiket zaten varsa yeniden oluşturmayın. Actions'ın açık olduğundan ve işlerin başarılı tamamlandığından emin olun. Etiket iş akışı APK ve Windows ZIP dosyasını GitHub Releases'e yükler. İş akışı depoya workflow dosyası yazma, sürüm işi ise Contents write erişimi gerektirir. Yerel APK ile CI çıktılarının test imzaları farklı olabilir.
+İlk komut yazma yetkili Git oturumu gerektirir. Etiket zaten varsa yeniden oluşturmayın. Etiket iş akışı APK ve Windows ZIP dosyasını GitHub Releases'e yükler. İş akışı depoya workflow dosyası yazma, sürüm işi ise Contents write erişimi gerektirir. Yerel APK ile CI çıktılarının test imzaları farklı olabilir.
