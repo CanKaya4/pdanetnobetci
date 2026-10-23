@@ -63,14 +63,27 @@ jobs:
         with:
           name: Windows-Nobetci
           path: windows
-      - run: cp apk/app-debug.apk PdaNet-Nobetci.apk && zip -j Windows-Nobetci.zip windows/* && sha256sum PdaNet-Nobetci.apk Windows-Nobetci.zip > SHA256SUMS.txt
+      - run: |
+          cp apk/app-debug.apk PdaNet-Nobetci.apk
+          zip -r -j Windows-Nobetci.zip windows/
+          unzip -Z1 Windows-Nobetci.zip | grep -Fx PdaNet-Nobetci.exe
+          sha256sum PdaNet-Nobetci.apk Windows-Nobetci.zip > SHA256SUMS.txt
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="$GITHUB_REF_NAME"
           if [ "$TAG" = main ]; then TAG=v0.1.0; fi
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release already exists; preserving published assets."
+            mkdir existing
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern Windows-Nobetci.zip --dir existing
+            if unzip -Z1 existing/Windows-Nobetci.zip | grep -Fxq PdaNet-Nobetci.exe; then
+              echo "Release already contains executable; preserving published assets."
+            else
+              gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern PdaNet-Nobetci.apk --dir existing
+              (cd existing && sha256sum PdaNet-Nobetci.apk) > SHA256SUMS.txt
+              sha256sum Windows-Nobetci.zip >> SHA256SUMS.txt
+              gh release upload "$TAG" Windows-Nobetci.zip SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
+            fi
           else
             gh release create "$TAG" PdaNet-Nobetci.apk Windows-Nobetci.zip SHA256SUMS.txt --target "$GITHUB_SHA" --repo "$GITHUB_REPOSITORY" --title "PdaNet Nobetci $TAG" --notes "Test imzali APK. Gercek Samsung/PdaNet kurtarma senaryolari donanimda henuz dogrulanmadi. Windows UIA destegi istemciye baglidir."
           fi
