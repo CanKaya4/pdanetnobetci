@@ -67,4 +67,3 @@ Windows EXE .NET Framework 4.8 kullanır. CI Android derleme/lint/JUnit ve Windo
 * [Android foreground service türleri](https://developer.android.com/develop/background-work/services/fgs/service-types): kullanıcı başlatmalı gözlem servisi `specialUse` kullanır; Play Store onayı iddia edilmez.
 
 MIT lisansı. PdaNet ile resmi bağlantısı olmayan bağımsız yardımcıdır.
-

@@ -1,0 +1,73 @@
+name: Build and verify
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - run: chmod +x gradlew && ./gradlew assembleDebug lintDebug testDebugUnitTest --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PdaNet-Nobetci-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Android-test-reports
+          path: |
+            app/build/reports/
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - run: dotnet build windows/Nobetci.csproj -c Release
+      - shell: powershell
+        run: |
+          $p = Start-Process windows/bin/Release/net48/PdaNet-Nobetci.exe -ArgumentList '--self-test' -Wait -PassThru -WindowStyle Hidden
+          if ($p.ExitCode -ne 0) { throw 'Windows self-test failed' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Windows-Nobetci
+          path: |
+            windows/bin/Release/net48/PdaNet-Nobetci.exe
+            windows/README.md
+  release:
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
+    needs: [android, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: PdaNet-Nobetci-APK
+          path: apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: Windows-Nobetci
+          path: windows
+      - run: cp apk/app-debug.apk PdaNet-Nobetci.apk && zip -j Windows-Nobetci.zip windows/* && sha256sum PdaNet-Nobetci.apk Windows-Nobetci.zip > SHA256SUMS.txt
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="$GITHUB_REF_NAME"
+          if [ "$TAG" = main ]; then TAG=v0.1.0; fi
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release already exists; preserving published assets."
+          else
+            gh release create "$TAG" PdaNet-Nobetci.apk Windows-Nobetci.zip SHA256SUMS.txt --target "$GITHUB_SHA" --repo "$GITHUB_REPOSITORY" --title "PdaNet Nobetci $TAG" --notes "Test imzali APK. Gercek Samsung/PdaNet kurtarma senaryolari donanimda henuz dogrulanmadi. Windows UIA destegi istemciye baglidir."
+          fi

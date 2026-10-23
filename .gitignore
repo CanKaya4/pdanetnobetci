@@ -1,0 +1,8 @@
+.gradle/
+**/build/
+local.properties
+*.jks
+.idea/
+**/bin/
+**/obj/
+teslim/
